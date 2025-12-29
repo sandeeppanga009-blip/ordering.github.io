@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Food Order Form</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: whitesmoke;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== FLOATING FOOD BACKGROUND ===== */
+        .food-bg span {
+            position: fixed;
+            bottom: -60px;
+            font-size: 60px;
+            animation: float 15s linear infinite;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .food-bg span:nth-child(1) { left: 5%; animation-duration: 12s; }
+        .food-bg span:nth-child(2) { left: 15%; animation-duration: 18s; }
+        .food-bg span:nth-child(3) { left: 30%; animation-duration: 14s; }
+        .food-bg span:nth-child(4) { left: 45%; animation-duration: 20s; }
+        .food-bg span:nth-child(5) { left: 60%; animation-duration: 16s; }
+        .food-bg span:nth-child(6) { left: 75%; animation-duration: 22s; }
+        .food-bg span:nth-child(7) { left: 90%; animation-duration: 19s; }
+
+        @keyframes float {
+            from { transform: translateY(0); }
+            to { transform: translateY(-120vh); }
+        }
+
+        /* ===== FORM BOX ===== */
+        .box {
+            background: white;
+            padding: 20px;
+            width: 340px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px grey;
+            z-index: 1;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        .radio-group {
+            margin: 10px 0;
+        }
+
+        .radio-group label {
+            display: block;
+            margin: 4px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        p {
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== FLOATING FOOD ===== -->
+<div class="food-bg">
+    <span>🍕</span>
+    <span>🍔</span>
+    <span>🍟</span>
+    <span>🌮</span>
+    <span>🍩</span>
+    <span>🍜</span>
+    <span>🍗</span>
+</div>
+
+<!-- ===== FORM ===== -->
+<div class="box">
+    <h3>Food Order Form</h3>
+
+    <input type="text" id="name" placeholder="Enter Name">
+
+    <!-- Starter -->
+    <div class="radio-group">
+        <strong>Starter Type</strong>
+        <label><input type="radio" name="starterType" value="Veg Starter"> Veg Starter</label>
+        <label><input type="radio" name="starterType" value="Non-Veg Starter"> Non-Veg Starter</label>
+    </div>
+
+    <!-- Phulka Count -->
+    <div class="radio-group">
+        <strong>Phulka (Count)</strong>
+        <label><input type="radio" name="phulka" value="2"> 2 Phulka</label>
+        <label><input type="radio" name="phulka" value="3"> 3 Phulka</label>
+        <label><input type="radio" name="phulka" value="4"> 4 Phulka</label>
+        <label><input type="radio" name="phulka" value="5"> 5 Phulka</label>
+        <label><input type="radio" name="phulka" value="6"> 6 Phulka</label>
+    </div>
+
+    <!-- Curry -->
+    <div class="radio-group">
+        <strong>Curry</strong>
+        <label><input type="radio" name="curry" value="Veg Curry"> Veg Curry</label>
+        <label><input type="radio" name="curry" value="Paneer Curry"> Paneer Curry</label>
+        <label><input type="radio" name="curry" value="Egg Curry"> Egg Curry</label>
+        <label><input type="radio" name="curry" value="Chicken Curry"> EggBhurji </label>
+    </div>
+
+    <!-- Jeera Rice + Dal -->
+    <div class="radio-group">
+        <strong>Jeera Rice + Dal</strong>
+        <label><input type="radio" name="jeeraRice" value="Yes"> Yes</label>
+        <label><input type="radio" name="jeeraRice" value="No"> No</label>
+    </div>
+
+    <button onclick="sendData()">Submit</button>
+
+    <p id="result"></p>
+</div>
+
+<script>
+function sendData() {
+    const name = document.getElementById("name").value;
+    const starterType = document.querySelector('input[name="starterType"]:checked')?.value;
+    const phulka = document.querySelector('input[name="phulka"]:checked')?.value;
+    const curry = document.querySelector('input[name="curry"]:checked')?.value;
+    const jeeraRice = document.querySelector('input[name="jeeraRice"]:checked')?.value;
+
+    // Auto date (DD/MM/YYYY)
+    const today = new Date().toLocaleDateString("en-GB");
+
+    if (!name || !starterType || !phulka || !curry || !jeeraRice) {
+        document.getElementById("result").innerText = "Please fill all fields";
+        return;
+    }
+
+    fetch("https://sheetdb.io/api/v1/hks0oudxit4qn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            data: [{
+                date: today,
+                name: name,
+                starter_type: starterType,
+                phulka: phulka,
+                curry: curry,
+                jeera_rice_dal: jeeraRice
+            }]
+        })
+    })
+    .then(res => res.json())
+    .then(() => {
+        document.getElementById("result").innerText = "Order submitted successfully!";
+    })
+    .catch(() => {
+        document.getElementById("result").innerText = "Error sending data";
+    });
+}
+</script>
+
+</body>
+</html>
